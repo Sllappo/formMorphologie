@@ -1,0 +1,36 @@
+version: '3.8'
+services:
+  postgres: # Le nom du service
+    container_name: postgres_container # Le nom du containeur
+    image: postgres # Le nom de l'image Docker pour PostgreSQL, elle sera récupérée automatiquement depuis le Docker Hub (Répertoire des images Docker)
+    environment: # Les variables d'environment
+      POSTGRES_USER: ${POSTGRES_USER:-admin} # Changez postgres après le tiret par le nom d'utilisateur que vous souhaitez
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-admin} # Changez motdepasse après le tiret par le mot de passe que vous souhaitez
+      PGDATA: /data/postgres # Ne changez pas
+    volumes: # Les volumes de stockage utilisés
+       - postgres:/data/postgres # Nous lions le volume nommé postgres vers le chemin /data/postgres dans le containeur
+    ports: # Les ports utilisés par le containeur que nous souhaitons rendre accessible à l'extérieur du containeur
+      - "5432:5432" # Le port 5432 sera accessible depuis l'extérieur
+    networks: # Les réseaux virtuels qui seront utilisés pour communiquer entre les containeurs
+      - postgres # Le réseau postgres (qui est un réseau virtuel) permettra aux containeurs du réseau virtuel de communiquer entre eux.
+    restart: unless-stopped # Le service redémarrera automatiquement au démarrage de Docker Daemon et ne s'arrêtera pas tant que l'utilisateur ne l'arrêtera pas.
+  
+  pgadmin: # Le nom du service
+    container_name: pgadmin_container # Le nom du containeur
+    image: dpage/pgadmin4 # Le nom de l'image Docker pour pgAdmin
+    environment: # Les variables d'environment
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@admin.com} # Changez admin après le tiret par l'email que vous souhaitez
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin} # Changez admin après le tiret par le mot de passe que vous souhaitez
+    volumes: # Les volumes de stockage utilisés
+      - pgadmin:/root/.pgadmin # Nous lions le volume nommé postgres vers le chemin /data/postgres dans le containeur
+    ports: # Les ports utilisés par le containeur que nous souhaitons rendre accessible à l'extérieur du containeur
+      - "${PGADMIN_PORT:-5050}:80" # Le port 5050 sera accessible depuis l'extérieur et sera redirigé vers le port 80 du containeur.
+    networks: # Les réseaux virtuels qui seront utilisés pour communiquer entre les containeurs
+      - postgres # Le réseau postgres permettra aux containeurs du réseau virtuel de communiquer entre eux.
+    restart: unless-stopped # Le service redémarrera automatiquement au démarrage de Docker Daemon et ne s'arrêtera pas tant que l'utilisateur ne l'arrêtera pas.networks: # Nous définissons les réseaux virtuels utilisés par le fichier
+networks: # Nous définissons les réseaux virtuels utilisés par le fichier
+  postgres:
+    driver: bridge # Le driver bridge est utilisé pour ce réseau virtuelvolumes: # Nous définissons les volumes utilisés par le fichier
+volumes: # Nous définissons les volumes utilisés par le fichier
+  postgres:
+  pgadmin:  
